@@ -33,18 +33,18 @@ public interface DataStore {
   void replace(String key, Data data);
 
   /**
-   * Add the given {@code Data} to an existing key after existing data
+   * Add the given data to an existing key after existing {@code Data}
    *
    * @param key They key
-   * @param data The {@code Data}
+   * @param data The data
    */
   void append(String key, byte[] data);
 
   /**
-   * Add the given {@code Data} to an existing key before existing data
+   * Add the given data to an existing key before existing {@code Data}
    *
    * @param key The key
-   * @param data The {@code Data}
+   * @param data The data
    */
   void prepend(String key, byte[] data);
 
