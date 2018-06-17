@@ -40,8 +40,6 @@ public class InMemoryLRUDataStore implements DataStore {
 
     try {
       keyToData.put(key, data);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     } finally {
       rwLock.writeLock().unlock();
     }
@@ -53,8 +51,6 @@ public class InMemoryLRUDataStore implements DataStore {
 
     try {
       keyToData.computeIfAbsent(key, k -> data);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     } finally {
       rwLock.writeLock().unlock();
     }
@@ -66,8 +62,6 @@ public class InMemoryLRUDataStore implements DataStore {
 
     try {
       keyToData.computeIfPresent(key, (k, v) -> data);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     } finally {
       rwLock.writeLock().unlock();
     }
@@ -82,8 +76,6 @@ public class InMemoryLRUDataStore implements DataStore {
         Byte[] appendedData = ObjectArrays.concat(v.data(), data, Byte.class);
         return Data.of(v.flags(), v.expireTime(), appendedData);
       });
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     } finally {
       rwLock.writeLock().unlock();
     }
@@ -98,8 +90,6 @@ public class InMemoryLRUDataStore implements DataStore {
         Byte[] prependedData = ObjectArrays.concat(data, v.data(), Byte.class);
         return Data.of(v.flags(), v.expireTime(), prependedData);
       });
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     } finally {
       rwLock.writeLock().unlock();
     }
@@ -121,8 +111,6 @@ public class InMemoryLRUDataStore implements DataStore {
 
       return builder.build();
 
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     } finally {
       rwLock.readLock().unlock();
     }
@@ -134,8 +122,6 @@ public class InMemoryLRUDataStore implements DataStore {
 
     try {
       keyToData.remove(key);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     } finally {
       rwLock.writeLock().unlock();
     }
