@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public class InMemoryLRUDataStoreTest {
 
@@ -51,11 +52,26 @@ public class InMemoryLRUDataStoreTest {
   public void testAppend() {
     Byte[] extraData = new Byte[] {100};
 
+    assertFalse(store.append(KEY_1, extraData));
+
+    store.set(KEY_1, DATA_1);
+    assertTrue(store.append(KEY_1, extraData));
+
+    Data expectedData = Data.of(0, 0, new Byte[] {1, 100});
+    assertEquals(expectedData, store.get(ImmutableList.of(KEY_1)).get(KEY_1));
   }
 
   @Test
   public void testPrepend() {
+    Byte[] extraData = new Byte[] {100};
 
+    assertFalse(store.prepend(KEY_1, extraData));
+
+    store.set(KEY_1, DATA_1);
+    assertTrue(store.prepend(KEY_1, extraData));
+
+    Data expectedData = Data.of(0, 0, new Byte[] {100, 1});
+    assertEquals(expectedData, store.get(ImmutableList.of(KEY_1)).get(KEY_1));
   }
 
   @Test
@@ -65,6 +81,11 @@ public class InMemoryLRUDataStoreTest {
 
   @Test
   public void testDelete() {
+    assertFalse(store.delete(KEY_1));
 
+    store.set(KEY_1, DATA_1);
+
+    assertTrue(store.delete(KEY_1));
+    assertEquals(ImmutableMap.of(), store.get(ImmutableList.of(KEY_1)));
   }
 }

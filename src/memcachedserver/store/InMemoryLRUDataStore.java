@@ -143,11 +143,17 @@ public class InMemoryLRUDataStore implements DataStore {
   }
 
   @Override
-  public void delete(@NonNull final String key) {
+  public boolean delete(@NonNull final String key) {
     rwLock.writeLock().lock();
 
     try {
+      if (!keyToData.containsKey(key)) {
+        return false;
+      }
+
       keyToData.remove(key);
+      return true;
+
     } finally {
       rwLock.writeLock().unlock();
     }

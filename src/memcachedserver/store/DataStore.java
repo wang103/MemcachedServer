@@ -64,6 +64,7 @@ public interface DataStore {
    * Delete the given key
    *
    * @param key The key
+   * @return true if succeeded, otherwise false
    */
-  void delete(String key);
+  boolean delete(String key);
 }
