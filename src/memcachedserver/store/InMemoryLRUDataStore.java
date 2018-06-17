@@ -46,22 +46,34 @@ public class InMemoryLRUDataStore implements DataStore {
   }
 
   @Override
-  public void add(@NonNull final String key, @NonNull final Data data) {
+  public boolean add(@NonNull final String key, @NonNull final Data data) {
     rwLock.writeLock().lock();
 
     try {
-      keyToData.computeIfAbsent(key, k -> data);
+      if (keyToData.containsKey(key)) {
+        return false;
+      }
+
+      keyToData.put(key, data);
+      return true;
+
     } finally {
       rwLock.writeLock().unlock();
     }
   }
 
   @Override
-  public void replace(@NonNull final String key, @NonNull final Data data) {
+  public boolean replace(@NonNull final String key, @NonNull final Data data) {
     rwLock.writeLock().lock();
 
     try {
-      keyToData.computeIfPresent(key, (k, v) -> data);
+      if (keyToData.containsKey(key)) {
+        keyToData.put(key, data);
+        return true;
+      }
+
+      return false;
+
     } finally {
       rwLock.writeLock().unlock();
     }

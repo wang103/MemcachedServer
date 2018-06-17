@@ -21,16 +21,18 @@ public interface DataStore {
    *
    * @param key The key
    * @param data The {@code Data}
+   * @return true if succeeded, otherwise false
    */
-  void add(String key, Data data);
+  boolean add(String key, Data data);
 
   /**
    * Set data for the given key only if the key already exists
    *
    * @param key The key
    * @param data The {@code Data}
+   * @return true if succeeded, otherwise false
    */
-  void replace(String key, Data data);
+  boolean replace(String key, Data data);
 
   /**
    * Add the given data to an existing key after existing {@code Data}

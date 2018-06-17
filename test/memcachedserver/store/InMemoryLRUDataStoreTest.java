@@ -2,6 +2,7 @@ package memcachedserver.store;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -15,7 +16,12 @@ public class InMemoryLRUDataStoreTest {
   private static final Data DATA_1 = Data.of(0, 0, new Byte[] {1});
   private static final Data DATA_2 = Data.of(0, 0, new Byte[] {2, 2});
 
-  private final InMemoryLRUDataStore store = new InMemoryLRUDataStore(CAPACITY);
+  private InMemoryLRUDataStore store;
+
+  @Before
+  public void setUp() {
+    store = new InMemoryLRUDataStore(CAPACITY);
+  }
 
   @Test
   public void testSet() {
@@ -28,7 +34,7 @@ public class InMemoryLRUDataStoreTest {
 
   @Test
   public void testAdd() {
-
+    store.add(KEY_1, DATA_1);
   }
 
   @Test
