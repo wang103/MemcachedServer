@@ -14,12 +14,9 @@ public class InMemoryLRUDataStore implements DataStore {
   private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
   private final ReadWriteLock rwLock = new ReentrantReadWriteLock(DEFAULT_LOCK_IS_FAIR);
-  private final int capacity;
   private final LinkedHashMap<String, Data> keyToData;
 
   public InMemoryLRUDataStore(final int capacity) {
-    this.capacity = capacity;
-
     this.keyToData = new LinkedHashMap<String, Data>(capacity, DEFAULT_LOAD_FACTOR, true) {
       private static final long serialVersionUID = -5250528325313906121L;
 
