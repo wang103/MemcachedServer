@@ -15,9 +15,14 @@ public class InMemoryLRUDataStoreTest {
   private static final int CAPACITY = 3;
 
   private static final String KEY_1 = "key 1";
+  private static final String KEY_2 = "key 2";
+  private static final String KEY_3 = "key 3";
+  private static final String KEY_4 = "key 4";
 
   private static final Data DATA_1 = Data.of(0, 0, new Byte[] {1});
   private static final Data DATA_2 = Data.of(0, 0, new Byte[] {2, 2});
+  private static final Data DATA_3 = Data.of(0, 0, new Byte[] {3, 3, 3});
+  private static final Data DATA_4 = Data.of(0, 0, new Byte[] {4, 4, 4, 4});
 
   private InMemoryLRUDataStore store;
 
@@ -76,7 +81,13 @@ public class InMemoryLRUDataStoreTest {
 
   @Test
   public void testGet() {
+    assertEquals(ImmutableMap.of(), store.get(ImmutableList.of(KEY_1, KEY_2)));
 
+    store.set(KEY_1, DATA_1);
+    assertEquals(ImmutableMap.of(KEY_1, DATA_1), store.get(ImmutableList.of(KEY_1, KEY_2)));
+
+    store.set(KEY_2, DATA_2);
+    assertEquals(ImmutableMap.of(KEY_1, DATA_1, KEY_2, DATA_2), store.get(ImmutableList.of(KEY_1, KEY_2)));
   }
 
   @Test
@@ -87,5 +98,18 @@ public class InMemoryLRUDataStoreTest {
 
     assertTrue(store.delete(KEY_1));
     assertEquals(ImmutableMap.of(), store.get(ImmutableList.of(KEY_1)));
+  }
+
+  @Test
+  public void testLRUEviction() {
+    store.set(KEY_1, DATA_1);
+    store.set(KEY_2, DATA_2);
+    store.set(KEY_3, DATA_3);
+    store.set(KEY_4, DATA_4);
+    assertEquals(ImmutableMap.of(), store.get(ImmutableList.of(KEY_1)));
+
+    store.get(ImmutableList.of(KEY_2));
+    store.set(KEY_1, DATA_1);
+    assertEquals(ImmutableMap.of(), store.get(ImmutableList.of(KEY_3)));
   }
 }
