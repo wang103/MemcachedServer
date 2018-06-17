@@ -1,8 +1,12 @@
 package memcachedserver.store;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import lombok.NonNull;
 
 /**
  * An in-memory bucketed cache for storing {@link Data}.
@@ -24,44 +28,54 @@ public class BucketedInMemoryLRUDataStore implements DataStore {
   }
 
   @Override
-  public void set(String key, Data data) {
-    // TODO Auto-generated method stub
-
+  public void set(@NonNull final String key, @NonNull final Data data) {
+    getBucketDataStore(key).set(key, data);
   }
 
   @Override
-  public boolean add(String key, Data data) {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean add(@NonNull final String key, @NonNull final Data data) {
+    return getBucketDataStore(key).add(key, data);
   }
 
   @Override
-  public boolean replace(String key, Data data) {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean replace(@NonNull final String key, @NonNull final Data data) {
+    return getBucketDataStore(key).replace(key, data);
   }
 
   @Override
-  public boolean append(String key, Byte[] data) {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean append(@NonNull final String key, @NonNull final Byte[] data) {
+    return getBucketDataStore(key).append(key, data);
   }
 
   @Override
-  public boolean prepend(String key, Byte[] data) {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean prepend(@NonNull final String key, @NonNull final Byte[] data) {
+    return getBucketDataStore(key).prepend(key, data);
   }
 
   @Override
-  public Map<String, Data> get(List<String> keys) {
-    // TODO Auto-generated method stub
-    return null;
+  public Map<String, Data> get(@NonNull final List<String> keys) {
+    Map<InMemoryLRUDataStore, List<String>> bucketDataStoreToKeys =
+        keys.stream().collect(Collectors.groupingBy(this::getBucketDataStore));
+
+    Map<String, Data> results = new HashMap<>();
+
+    for (Map.Entry<InMemoryLRUDataStore, List<String>> entry : bucketDataStoreToKeys.entrySet()) {
+      InMemoryLRUDataStore bucketDataStore = entry.getKey();
+      List<String> bucketKeys = entry.getValue();
+
+      results.putAll(bucketDataStore.get(bucketKeys));
+    }
+
+    return results;
   }
 
   @Override
-  public boolean delete(String key) {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean delete(@NonNull final String key) {
+    return getBucketDataStore(key).delete(key);
+  }
+
+  private InMemoryLRUDataStore getBucketDataStore(final String key) {
+    int index = Math.floorMod(key.hashCode(), numBuckets);
+    return dataStores.get(index);
   }
 }
