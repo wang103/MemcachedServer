@@ -39,16 +39,18 @@ public interface DataStore {
    *
    * @param key They key
    * @param data The data
+   * @return true if succeeded, otherwise false
    */
-  void append(String key, Byte[] data);
+  boolean append(String key, Byte[] data);
 
   /**
    * Add the given data to an existing key before existing {@code Data}
    *
    * @param key The key
    * @param data The data
+   * @return true if succeeded, otherwise false
    */
-  void prepend(String key, Byte[] data);
+  boolean prepend(String key, Byte[] data);
 
   /**
    * Retrieve {@code Data} corresponding to the given set of keys

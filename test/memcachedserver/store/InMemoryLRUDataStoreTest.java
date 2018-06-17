@@ -1,6 +1,8 @@
 package memcachedserver.store;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,16 +36,20 @@ public class InMemoryLRUDataStoreTest {
 
   @Test
   public void testAdd() {
-    store.add(KEY_1, DATA_1);
+    assertTrue(store.add(KEY_1, DATA_1));
+    assertFalse(store.add(KEY_1, DATA_2));
   }
 
   @Test
   public void testReplace() {
-
+    assertFalse(store.replace(KEY_1, DATA_1));
+    store.set(KEY_1, DATA_1);
+    assertTrue(store.replace(KEY_1, DATA_2));
   }
 
   @Test
   public void testAppend() {
+    Byte[] extraData = new Byte[] {100};
 
   }
 

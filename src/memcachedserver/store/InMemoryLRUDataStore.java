@@ -80,28 +80,42 @@ public class InMemoryLRUDataStore implements DataStore {
   }
 
   @Override
-  public void append(@NonNull final String key, @NonNull final Byte[] data) {
+  public boolean append(@NonNull final String key, @NonNull final Byte[] data) {
     rwLock.writeLock().lock();
 
     try {
-      keyToData.computeIfPresent(key, (k, v) -> {
-        Byte[] appendedData = ObjectArrays.concat(v.data(), data, Byte.class);
-        return Data.of(v.flags(), v.expireTime(), appendedData);
-      });
+      Data existingData = keyToData.get(key);
+
+      if (existingData == null) {
+        return false;
+      }
+
+      Byte[] appendedData = ObjectArrays.concat(existingData.data(), data, Byte.class);
+      keyToData.put(key, Data.of(existingData.flags(), existingData.expireTime(), appendedData));
+
+      return true;
+
     } finally {
       rwLock.writeLock().unlock();
     }
   }
 
   @Override
-  public void prepend(@NonNull final String key, @NonNull final Byte[] data) {
+  public boolean prepend(@NonNull final String key, @NonNull final Byte[] data) {
     rwLock.writeLock().lock();
 
     try {
-      keyToData.computeIfPresent(key, (k, v) -> {
-        Byte[] prependedData = ObjectArrays.concat(data, v.data(), Byte.class);
-        return Data.of(v.flags(), v.expireTime(), prependedData);
-      });
+      Data existingData = keyToData.get(key);
+
+      if (existingData == null) {
+        return false;
+      }
+
+      Byte[] prependedData = ObjectArrays.concat(data, existingData.data(), Byte.class);
+      keyToData.put(key, Data.of(existingData.flags(), existingData.expireTime(), prependedData));
+
+      return true;
+
     } finally {
       rwLock.writeLock().unlock();
     }
