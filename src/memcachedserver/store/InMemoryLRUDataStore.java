@@ -6,8 +6,15 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ObjectArrays;
+
 import lombok.NonNull;
 
+/**
+ * An in-memory cache for storing {@link Data} with LRU eviction policy.
+ * The implementation is thread-safe.
+ */
 public class InMemoryLRUDataStore implements DataStore {
 
   private static final boolean DEFAULT_LOCK_IS_FAIR = false;  // for higher throughput
@@ -29,43 +36,108 @@ public class InMemoryLRUDataStore implements DataStore {
 
   @Override
   public void set(@NonNull final String key, @NonNull final Data data) {
-    // TODO Auto-generated method stub
+    rwLock.writeLock().lock();
 
+    try {
+      keyToData.put(key, data);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      rwLock.writeLock().unlock();
+    }
   }
 
   @Override
   public void add(@NonNull final String key, @NonNull final Data data) {
-    // TODO Auto-generated method stub
+    rwLock.writeLock().lock();
 
+    try {
+      keyToData.computeIfAbsent(key, k -> data);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      rwLock.writeLock().unlock();
+    }
   }
 
   @Override
   public void replace(@NonNull final String key, @NonNull final Data data) {
-    // TODO Auto-generated method stub
+    rwLock.writeLock().lock();
 
+    try {
+      keyToData.computeIfPresent(key, (k, v) -> data);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      rwLock.writeLock().unlock();
+    }
   }
 
   @Override
-  public void append(@NonNull final String key, @NonNull final byte[] data) {
-    // TODO Auto-generated method stub
+  public void append(@NonNull final String key, @NonNull final Byte[] data) {
+    rwLock.writeLock().lock();
 
+    try {
+      keyToData.computeIfPresent(key, (k, v) -> {
+        Byte[] appendedData = ObjectArrays.concat(v.data(), data, Byte.class);
+        return Data.of(v.flags(), v.expireTime(), appendedData);
+      });
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      rwLock.writeLock().unlock();
+    }
   }
 
   @Override
-  public void prepend(@NonNull final String key, @NonNull final byte[] data) {
-    // TODO Auto-generated method stub
+  public void prepend(@NonNull final String key, @NonNull final Byte[] data) {
+    rwLock.writeLock().lock();
 
+    try {
+      keyToData.computeIfPresent(key, (k, v) -> {
+        Byte[] prependedData = ObjectArrays.concat(data, v.data(), Byte.class);
+        return Data.of(v.flags(), v.expireTime(), prependedData);
+      });
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      rwLock.writeLock().unlock();
+    }
   }
 
   @Override
   public Map<String, Data> get(@NonNull final List<String> keys) {
-    // TODO Auto-generated method stub
-    return null;
+    rwLock.readLock().lock();
+
+    try {
+      ImmutableMap.Builder<String, Data> builder = new ImmutableMap.Builder<>();
+
+      for (String key : keys) {
+        Data data = keyToData.get(key);
+        if (data != null) {
+          builder.put(key, data);
+        }
+      }
+
+      return builder.build();
+
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      rwLock.readLock().unlock();
+    }
   }
 
   @Override
   public void delete(@NonNull final String key) {
-    // TODO Auto-generated method stub
+    rwLock.writeLock().lock();
 
+    try {
+      keyToData.remove(key);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      rwLock.writeLock().unlock();
+    }
   }
 }

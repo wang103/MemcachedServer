@@ -13,5 +13,5 @@ public class Data {
 
   private final int expireTime;
 
-  @NonNull private final byte[] data;
+  @NonNull private final Byte[] data;
 }

@@ -38,7 +38,7 @@ public interface DataStore {
    * @param key They key
    * @param data The data
    */
-  void append(String key, byte[] data);
+  void append(String key, Byte[] data);
 
   /**
    * Add the given data to an existing key before existing {@code Data}
@@ -46,7 +46,7 @@ public interface DataStore {
    * @param key The key
    * @param data The data
    */
-  void prepend(String key, byte[] data);
+  void prepend(String key, Byte[] data);
 
   /**
    * Retrieve {@code Data} corresponding to the given set of keys
