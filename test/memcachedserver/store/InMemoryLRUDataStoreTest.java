@@ -4,11 +4,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
+import lombok.RequiredArgsConstructor;
 
 public class InMemoryLRUDataStoreTest {
 
@@ -111,5 +116,63 @@ public class InMemoryLRUDataStoreTest {
     store.get(ImmutableList.of(KEY_2));
     store.set(KEY_1, DATA_1);
     assertEquals(ImmutableMap.of(), store.get(ImmutableList.of(KEY_3)));
+  }
+
+  @Test
+  public void testConcurrency() throws Exception {
+    List<StoreWriter> writers = new ArrayList<>();
+    for (int i = 0; i < 20; i++) {
+      writers.add(new StoreWriter(store));
+    }
+
+    List<StoreReader> readers = new ArrayList<>();
+    for (int i = 0; i < 50; i++) {
+      readers.add(new StoreReader(store));
+    }
+
+    writers.forEach(StoreWriter::start);
+    readers.forEach(StoreReader::start);
+
+    for (StoreWriter writer : writers) {
+      writer.join(10000);
+    }
+
+    for (StoreReader reader : readers) {
+      reader.join(10000);
+    }
+  }
+
+  @RequiredArgsConstructor
+  private static class StoreWriter extends Thread {
+    private final InMemoryLRUDataStore dataStore;
+
+    @Override
+    public void run() {
+      for (int i = 0; i < 30; i++) {
+        dataStore.set(KEY_1, DATA_1);
+
+        dataStore.add(KEY_2, DATA_2);
+
+        dataStore.replace(KEY_1, DATA_3);
+
+        dataStore.append(KEY_3, new Byte[] {100});
+
+        dataStore.prepend(KEY_4, new Byte[] {100});
+
+        dataStore.delete(KEY_2);
+      }
+    }
+  }
+
+  @RequiredArgsConstructor
+  private static class StoreReader extends Thread {
+    private final InMemoryLRUDataStore dataStore;
+
+    @Override
+    public void run() {
+      for (int i = 0; i < 100; i++) {
+        dataStore.get(ImmutableList.of(KEY_1, KEY_2, KEY_3, KEY_4));
+      }
+    }
   }
 }
