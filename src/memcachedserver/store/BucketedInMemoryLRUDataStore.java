@@ -16,7 +16,7 @@ import lombok.NonNull;
 public class BucketedInMemoryLRUDataStore implements DataStore {
 
   private final int numBuckets;
-  private final List<InMemoryLRUDataStore> dataStores;
+  @NonNull private final List<InMemoryLRUDataStore> dataStores;
 
   public BucketedInMemoryLRUDataStore(final int numBuckets, final int bucketCapacity) {
     this.numBuckets = numBuckets;
