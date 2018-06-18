@@ -6,6 +6,9 @@ import java.net.Socket;
 
 import lombok.NonNull;
 
+/**
+ * For handling input from one client via {@link Socket}.
+ */
 public class InputHandler {
   @NonNull private final DataInputStream inputStream;
 

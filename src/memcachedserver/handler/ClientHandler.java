@@ -8,6 +8,7 @@ import memcachedserver.store.DataStore;
 
 /**
  * For handling communication with one client via {@link Socket}.
+ * This class is responsible for closing the socket when it's no longer needed.
  */
 public class ClientHandler implements Runnable {
   @NonNull private final Socket socket;
