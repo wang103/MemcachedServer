@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -14,6 +16,7 @@ import lombok.NonNull;
 import memcachedserver.command.Command;
 import memcachedserver.command.CommandType;
 import memcachedserver.command.DeleteCommand;
+import memcachedserver.command.RetrievalCommand;
 
 /**
  * For handling input from one client via {@link Socket}.
@@ -64,8 +67,14 @@ public class InputHandler {
     return null;
   }
 
-  private Optional<Command> toRetrievalCommand(final String[] components) {
-    return null;
+  @VisibleForTesting
+  Optional<Command> toRetrievalCommand(final String[] components) {
+    if (components.length < 2) {
+      return Optional.empty();
+    }
+
+    List<String> keys = Arrays.asList(components).subList(1, components.length);
+    return Optional.of(RetrievalCommand.of(components[0], keys));
   }
 
   @VisibleForTesting

@@ -11,10 +11,15 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
+
 import memcachedserver.command.DeleteCommand;
+import memcachedserver.command.RetrievalCommand;
 
 public class InputHandlerTest {
-  private static final String KEY = "key";
+  private static final String KEY_1 = "key1";
+  private static final String KEY_2 = "key2";
+  private static final String KEY_3 = "key3";
 
   private InputHandler inputHandler;
 
@@ -26,11 +31,22 @@ public class InputHandlerTest {
   }
 
   @Test
-  public void testToDeleteCommand() {
-    String[] components = {"delete", KEY};
-    assertEquals(Optional.of(DeleteCommand.of("delete", KEY)), inputHandler.toDeleteCommand(components));
+  public void testToRetrievalCommand() {
+    String[] components = {"get", KEY_1, KEY_2, KEY_3};
+    assertEquals(
+        Optional.of(RetrievalCommand.of("get", ImmutableList.of(KEY_1, KEY_2, KEY_3))),
+        inputHandler.toRetrievalCommand(components));
 
-    String[] invalidComponents = {"delete", KEY, "???"};
+    String[] invalidComponents = {"get"};
+    assertEquals(Optional.empty(), inputHandler.toRetrievalCommand(invalidComponents));
+  }
+
+  @Test
+  public void testToDeleteCommand() {
+    String[] components = {"delete", KEY_1};
+    assertEquals(Optional.of(DeleteCommand.of("delete", KEY_1)), inputHandler.toDeleteCommand(components));
+
+    String[] invalidComponents = {"delete", KEY_1, "???"};
     assertEquals(Optional.empty(), inputHandler.toDeleteCommand(invalidComponents));
   }
 }
