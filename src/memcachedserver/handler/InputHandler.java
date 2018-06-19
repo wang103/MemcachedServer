@@ -41,7 +41,8 @@ public class InputHandler {
     return toCommand(components);
   }
 
-  private Optional<Command> toCommand(final String[] components) {
+  @VisibleForTesting
+  Optional<Command> toCommand(final String[] components) {
     if (components.length < 1) {
       return Optional.empty();
     }

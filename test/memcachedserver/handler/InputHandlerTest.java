@@ -32,6 +32,31 @@ public class InputHandlerTest {
   }
 
   @Test
+  public void testToCommand() {
+    String[] storageCommand = {"append", KEY_1, "0", "1", "2"};
+    assertEquals(
+        Optional.of(StorageCommand.of("append", KEY_1, 0, 1, 2)),
+        inputHandler.toCommand(storageCommand));
+
+    String[] retrievalCommand = {"get", KEY_1, KEY_2};
+    assertEquals(
+        Optional.of(RetrievalCommand.of("get", ImmutableList.of(KEY_1, KEY_2))),
+        inputHandler.toCommand(retrievalCommand));
+
+    String[] deleteCommand = {"delete", KEY_3};
+    assertEquals(Optional.of(DeleteCommand.of("delete", KEY_3)), inputHandler.toCommand(deleteCommand));
+  }
+
+  @Test
+  public void testToCommandFailure() {
+    String[] invalidComponents1 = {};
+    assertEquals(Optional.empty(), inputHandler.toCommand(invalidComponents1));
+
+    String[] invalidComponents2 = {"garbage", KEY_1};
+    assertEquals(Optional.empty(), inputHandler.toCommand(invalidComponents2));
+  }
+
+  @Test
   public void testToStorageCommand() {
     String[] components = {"prepend", KEY_1, "1", "2", "3"};
     assertEquals(
