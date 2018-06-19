@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +19,8 @@ import memcachedserver.command.RetrievalCommand;
 import memcachedserver.command.StorageCommand;
 
 public class InputHandlerTest {
-  private static final String INPUT = "  replace  key 8   9 10    ";
+  private static final String COMMAND_INPUT = "  replace  key 8   9 10    \r\n";
+  private static final String DATA_INPUT = "dsasd453adfg^(@$^dfa{}|}:>?dfa\r\n";
 
   private static final String KEY_1 = "key1";
   private static final String KEY_2 = "key2";
@@ -29,7 +31,7 @@ public class InputHandlerTest {
   @Before
   public void setUp() throws IOException {
     InputStream inputStream = new ByteArrayInputStream(
-        INPUT.getBytes(StandardCharsets.UTF_8));
+        (COMMAND_INPUT + DATA_INPUT).getBytes(StandardCharsets.UTF_8));
 
     inputHandler = new InputHandler(inputStream);
   }
@@ -39,6 +41,36 @@ public class InputHandlerTest {
     assertEquals(
         Optional.of(StorageCommand.of("replace", "key", 8, 9, 10)),
         inputHandler.readCommand());
+  }
+
+  @Test
+  public void testReadData() throws IOException {
+    // Ignore the command
+    inputHandler.readCommand();
+
+    Optional<Byte[]> data = inputHandler.readData(DATA_INPUT.length() - 2);
+    assertEquals(DATA_INPUT.length() - 2, data.get().length);
+
+    String dataStr = new String(ArrayUtils.toPrimitive(data.get()), StandardCharsets.UTF_8);
+    assertEquals(DATA_INPUT.substring(0, DATA_INPUT.length() - 2), dataStr);
+  }
+
+  @Test
+  public void testReadDataLessFailure() throws IOException {
+    // Ignore the command
+    inputHandler.readCommand();
+
+    Optional<Byte[]> data = inputHandler.readData(DATA_INPUT.length() - 3);
+    assertEquals(Optional.empty(), data);
+  }
+
+  @Test
+  public void testReadDataMoreFailure() throws IOException {
+    // Ignore the command
+    inputHandler.readCommand();
+
+    Optional<Byte[]> data = inputHandler.readData(DATA_INPUT.length() + 100);
+    assertEquals(Optional.empty(), data);
   }
 
   @Test

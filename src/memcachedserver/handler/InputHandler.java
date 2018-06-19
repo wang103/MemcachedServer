@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.google.common.annotations.VisibleForTesting;
 
 import lombok.NonNull;
@@ -39,6 +41,25 @@ public class InputHandler {
     String line = bufferedReader.readLine().trim();
     String[] components = line.split("\\s+");
     return toCommand(components);
+  }
+
+  /**
+   * Read a line and get the corresponding data block
+   *
+   * @param len the size of the data block, excluding \r\n
+   * @return the data block if valid
+   * @throws IOException if an I/O error occurs
+   */
+  public Optional<Byte[]> readData(final int len) throws IOException {
+    char[] buffer = new char[len + 2];
+    int count = bufferedReader.read(buffer, 0, len + 2);
+
+    if (count != len + 2 || buffer[count - 2] != '\r' || buffer[count - 1] != '\n') {
+      return Optional.empty();
+    }
+
+    byte[] data = new String(buffer, 0, len).getBytes(StandardCharsets.UTF_8);
+    return Optional.of(ArrayUtils.toObject(data));
   }
 
   @VisibleForTesting
