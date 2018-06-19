@@ -1,19 +1,15 @@
 package memcachedserver;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 
-import memcachedserver.handler.ClientHandler;
+import memcachedserver.server.MemcachedServer;
 import memcachedserver.store.BucketedInMemoryLRUDataStore;
 import memcachedserver.store.DataStore;
 
-public class MemcachedServer {
+public class MemcachedServerApp {
   private static final String DEFAULT_PORT = "11211";
   private static final String DEFAULT_NUM_BUCKETS = "1000";
   private static final String DEFAULT_BUCKET_CAPACITY = "10000";
@@ -37,18 +33,6 @@ public class MemcachedServer {
 
     DataStore dataStore = new BucketedInMemoryLRUDataStore(numBuckets, bucketCapacity);
 
-    startServer(port, dataStore);
-  }
-
-  private static void startServer(final int port, final DataStore dataStore) throws IOException {
-    ServerSocket ss = new ServerSocket(port);
-
-    while (true) {
-      Socket socket = ss.accept();
-
-      Runnable clientHandler = new ClientHandler(socket, dataStore);
-
-      new Thread(clientHandler).start();
-    }
+    new MemcachedServer(dataStore).start(port);
   }
 }
