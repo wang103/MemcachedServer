@@ -5,11 +5,13 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
 /**
  * This abstract class represents any possible memcached command.
  */
+@EqualsAndHashCode
 public abstract class Command {
   private static final Set<String> STORAGE_COMMANDS =
       ImmutableSet.of("set", "add", "replace", "append", "prepend");

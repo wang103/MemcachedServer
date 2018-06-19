@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import lombok.NonNull;
 import memcachedserver.command.Command;
 import memcachedserver.command.CommandType;
@@ -66,7 +68,8 @@ public class InputHandler {
     return null;
   }
 
-  private Optional<Command> toDeleteCommand(final String[] components) {
+  @VisibleForTesting
+  Optional<Command> toDeleteCommand(final String[] components) {
     if (components.length != 2) {
       return Optional.empty();
     }
