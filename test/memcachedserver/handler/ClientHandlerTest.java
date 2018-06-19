@@ -2,6 +2,7 @@ package memcachedserver.handler;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -50,6 +51,7 @@ public class ClientHandlerTest {
     StorageCommand command = StorageCommand.of("add", KEY_1, 1, 1, 0);
 
     clientHandler.handleStorageCommand(command);
+    verify(dataStore).add(KEY_1, DATA_1);
     verify(outputHandler).writeLine("STORED");
   }
 
@@ -68,6 +70,7 @@ public class ClientHandlerTest {
 
     when(inputHandler.readData(0)).thenReturn(Optional.empty());
     clientHandler.handleStorageCommand(command);
+    verifyZeroInteractions(dataStore);
     verify(outputHandler).writeLine("CLIENT_ERROR bad data chunk");
   }
 
