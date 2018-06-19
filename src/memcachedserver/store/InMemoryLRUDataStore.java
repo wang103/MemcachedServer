@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -128,11 +129,18 @@ public class InMemoryLRUDataStore implements DataStore {
 
     try {
       ImmutableMap.Builder<String, Data> builder = new ImmutableMap.Builder<>();
+      Set<String> addedKeys = new HashSet<>();
 
-      for (String key : new HashSet<>(keys)) {
+      for (String key : keys) {
+        if (addedKeys.contains(key)) {
+          // make sure we don't put duplicated keys into the ImmutableMap.Builder
+          continue;
+        }
+
         Data data = keyToData.get(key);
         if (data != null) {
           builder.put(key, data);
+          addedKeys.add(key);
         }
       }
 
