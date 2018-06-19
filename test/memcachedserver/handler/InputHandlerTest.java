@@ -18,6 +18,8 @@ import memcachedserver.command.RetrievalCommand;
 import memcachedserver.command.StorageCommand;
 
 public class InputHandlerTest {
+  private static final String INPUT = "  replace  key 8   9 10    ";
+
   private static final String KEY_1 = "key1";
   private static final String KEY_2 = "key2";
   private static final String KEY_3 = "key3";
@@ -26,9 +28,17 @@ public class InputHandlerTest {
 
   @Before
   public void setUp() throws IOException {
-    InputStream inputStream = new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8));
+    InputStream inputStream = new ByteArrayInputStream(
+        INPUT.getBytes(StandardCharsets.UTF_8));
 
     inputHandler = new InputHandler(inputStream);
+  }
+
+  @Test
+  public void testReadCommand() throws IOException {
+    assertEquals(
+        Optional.of(StorageCommand.of("replace", "key", 8, 9, 10)),
+        inputHandler.readCommand());
   }
 
   @Test

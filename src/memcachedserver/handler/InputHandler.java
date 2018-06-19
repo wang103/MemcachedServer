@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -20,19 +19,20 @@ import memcachedserver.command.RetrievalCommand;
 import memcachedserver.command.StorageCommand;
 
 /**
- * For handling input from one client via {@link Socket}.
+ * For handling input from one client.
  */
 public class InputHandler {
   @NonNull private final BufferedReader bufferedReader;
 
   public InputHandler(@NonNull final InputStream inputStream) throws IOException {
-    this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+    this.bufferedReader = new BufferedReader(
+        new InputStreamReader(inputStream, StandardCharsets.UTF_8));
   }
 
   /**
    * Read a line and get the corresponding {@code Command}
    *
-   * @return the {@code Command}
+   * @return the {@code Command} if the line is a valid command line
    * @throws IOException if an I/O error occurs
    */
   public Optional<Command> readCommand() throws IOException {
