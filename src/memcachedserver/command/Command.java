@@ -19,6 +19,10 @@ public abstract class Command {
 
   @NonNull protected String name;
 
+  Command(@NonNull final String name) {
+    this.name = name;
+  }
+
   public static Optional<CommandType> toCommandType(@NonNull final String commandName) {
     if (STORAGE_COMMANDS.contains(commandName)) {
       return Optional.of(CommandType.STORAGE);

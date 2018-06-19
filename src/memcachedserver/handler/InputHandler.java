@@ -11,6 +11,7 @@ import java.util.Optional;
 import lombok.NonNull;
 import memcachedserver.command.Command;
 import memcachedserver.command.CommandType;
+import memcachedserver.command.DeleteCommand;
 
 /**
  * For handling input from one client via {@link Socket}.
@@ -35,8 +36,7 @@ public class InputHandler {
   }
 
   private Optional<Command> toCommand(final String[] components) {
-    int numComponents = components.length;
-    if (numComponents < 1) {
+    if (components.length < 1) {
       return Optional.empty();
     }
 
@@ -46,6 +46,31 @@ public class InputHandler {
       return Optional.empty();
     }
 
+    switch (commandType.get()) {
+    case STORAGE:
+      return toStorageCommand(components);
+    case RETRIEVAL:
+      return toRetrievalCommand(components);
+    case DELETE:
+      return toDeleteCommand(components);
+    default:
+      return Optional.empty();
+    }
+  }
+
+  private Optional<Command> toStorageCommand(final String[] components) {
     return null;
+  }
+
+  private Optional<Command> toRetrievalCommand(final String[] components) {
+    return null;
+  }
+
+  private Optional<Command> toDeleteCommand(final String[] components) {
+    if (components.length != 2) {
+      return Optional.empty();
+    }
+
+    return Optional.of(DeleteCommand.of(components[0], components[1]));
   }
 }
