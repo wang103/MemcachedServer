@@ -25,6 +25,8 @@ public class MemcachedServer {
   public void start(final int port) throws IOException {
     ServerSocket ss = new ServerSocket(port);
 
+    System.out.println("Listening for incoming connections");
+
     try {
       while (true) {
         Socket socket = ss.accept();
