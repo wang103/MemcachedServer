@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,6 +54,18 @@ public class ClientHandlerTest {
     clientHandler.handleStorageCommand(command);
     verify(dataStore).add(KEY_1, DATA_1);
     verify(outputHandler).writeLine("STORED");
+  }
+
+  @Test
+  public void testHandleStorageCommandKeyTooLong() throws IOException {
+    String key = StringUtils.repeat('a', 251);
+    StorageCommand command = StorageCommand.of("add", key, 1, 1, 0);
+
+    clientHandler.handleStorageCommand(command);
+    verifyZeroInteractions(dataStore);
+    verifyZeroInteractions(inputHandler);
+
+    verify(outputHandler).writeLine("CLIENT_ERROR bad command line format");
   }
 
   @Test

@@ -22,6 +22,8 @@ import memcachedserver.store.DataStore;
  */
 @RequiredArgsConstructor
 public class ClientHandler implements Runnable {
+  private static final int MAX_KEY_LENGTH = 250;
+
   @NonNull private final Socket socket;
   @NonNull private final DataStore dataStore;
   @NonNull private final InputHandler inputHandler;
@@ -69,6 +71,11 @@ public class ClientHandler implements Runnable {
 
   @VisibleForTesting
   void handleStorageCommand(final StorageCommand command) throws IOException {
+    if (command.key().length() > MAX_KEY_LENGTH) {
+      outputHandler.writeLine("CLIENT_ERROR bad command line format");
+      return;
+    }
+
     Optional<Byte[]> data = inputHandler.readData(command.numBytes());
     if (!data.isPresent()) {
       outputHandler.writeLine("CLIENT_ERROR bad data chunk");
