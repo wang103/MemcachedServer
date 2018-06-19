@@ -17,6 +17,7 @@ import memcachedserver.command.Command;
 import memcachedserver.command.CommandType;
 import memcachedserver.command.DeleteCommand;
 import memcachedserver.command.RetrievalCommand;
+import memcachedserver.command.StorageCommand;
 
 /**
  * For handling input from one client via {@link Socket}.
@@ -63,8 +64,17 @@ public class InputHandler {
     }
   }
 
-  private Optional<Command> toStorageCommand(final String[] components) {
-    return null;
+  @VisibleForTesting
+  Optional<Command> toStorageCommand(final String[] components) {
+    if (components.length != 5) {
+      return Optional.empty();
+    }
+
+    int flags = Integer.valueOf(components[2]);
+    int expireTime = Integer.valueOf(components[3]);
+    int numBytes = Integer.valueOf(components[4]);
+
+    return Optional.of(StorageCommand.of(components[0], components[1], flags, expireTime, numBytes));
   }
 
   @VisibleForTesting
@@ -74,6 +84,7 @@ public class InputHandler {
     }
 
     List<String> keys = Arrays.asList(components).subList(1, components.length);
+
     return Optional.of(RetrievalCommand.of(components[0], keys));
   }
 

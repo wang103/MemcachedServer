@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableList;
 
 import memcachedserver.command.DeleteCommand;
 import memcachedserver.command.RetrievalCommand;
+import memcachedserver.command.StorageCommand;
 
 public class InputHandlerTest {
   private static final String KEY_1 = "key1";
@@ -28,6 +29,17 @@ public class InputHandlerTest {
     InputStream inputStream = new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8));
 
     inputHandler = new InputHandler(inputStream);
+  }
+
+  @Test
+  public void testToStorageCommand() {
+    String[] components = {"prepend", KEY_1, "1", "2", "3"};
+    assertEquals(
+        Optional.of(StorageCommand.of("prepend", KEY_1, 1, 2, 3)),
+        inputHandler.toStorageCommand(components));
+
+    String[] invalidComponents = {"add", "KEY_2"};
+    assertEquals(Optional.empty(), inputHandler.toStorageCommand(invalidComponents));
   }
 
   @Test
@@ -46,7 +58,7 @@ public class InputHandlerTest {
     String[] components = {"delete", KEY_1};
     assertEquals(Optional.of(DeleteCommand.of("delete", KEY_1)), inputHandler.toDeleteCommand(components));
 
-    String[] invalidComponents = {"delete", KEY_1, "???"};
+    String[] invalidComponents = {"delete", KEY_1, KEY_2};
     assertEquals(Optional.empty(), inputHandler.toDeleteCommand(invalidComponents));
   }
 }
