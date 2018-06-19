@@ -72,13 +72,29 @@ public class ClientHandler implements Runnable {
       dataStore.set(command.key(), Data.of(command.flags(), command.expireTime(), data.get()));
       outputHandler.writeLine("STORED");
     } else if (command.name().equals("add")) {
-
+      if (dataStore.add(command.key(), Data.of(command.flags(), command.expireTime(), data.get()))) {
+        outputHandler.writeLine("STORED");
+      } else {
+        outputHandler.writeLine("NOT_STORED");
+      }
     } else if (command.name().equals("replace")) {
-
+      if (dataStore.replace(command.key(), Data.of(command.flags(), command.expireTime(), data.get()))) {
+        outputHandler.writeLine("STORED");
+      } else {
+        outputHandler.writeLine("NOT_STORED");
+      }
     } else if (command.name().equals("append")) {
-
+      if (dataStore.append(command.name(), data.get())) {
+        outputHandler.writeLine("STORED");
+      } else {
+        outputHandler.writeLine("NOT_STORED");
+      }
     } else if (command.name().equals("prepend")) {
-
+      if (dataStore.prepend(command.name(), data.get())) {
+        outputHandler.writeLine("STORED");
+      } else {
+        outputHandler.writeLine("NOT_STORED");
+      }
     }
   }
 
