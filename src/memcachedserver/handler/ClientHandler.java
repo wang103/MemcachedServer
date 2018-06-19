@@ -19,8 +19,8 @@ public class ClientHandler implements Runnable {
   public ClientHandler(@NonNull final Socket socket, @NonNull final DataStore dataStore) throws IOException {
     this.socket = socket;
     this.dataStore = dataStore;
-    this.inputHandler = new InputHandler(socket);
-    this.outputHandler = new OutputHandler(socket);
+    this.inputHandler = new InputHandler(socket.getInputStream());
+    this.outputHandler = new OutputHandler(socket.getOutputStream());
   }
 
   @Override
