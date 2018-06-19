@@ -2,8 +2,10 @@ package memcachedserver.handler;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Optional;
 
 import lombok.NonNull;
+import memcachedserver.command.Command;
 import memcachedserver.store.DataStore;
 
 /**
@@ -25,6 +27,25 @@ public class ClientHandler implements Runnable {
 
   @Override
   public void run() {
+    try {
+      while (true) {
+        Optional<Command> command = inputHandler.readCommand();
+      }
+    } catch (IOException e) {
+      // ignore IOException, client closed its connection, so we just need to
+      // release our resources and exit this thread
+    } finally {
+      releaseResources();
+    }
+  }
 
+  private void releaseResources() {
+    try {
+      inputHandler.close();
+      outputHandler.close();
+      socket.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }
