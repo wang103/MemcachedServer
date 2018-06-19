@@ -103,7 +103,8 @@ public class ClientHandler implements Runnable {
     }
   }
 
-  private void handleRetrievalCommand(final RetrievalCommand command) throws IOException {
+  @VisibleForTesting
+  void handleRetrievalCommand(final RetrievalCommand command) throws IOException {
     Map<String, Data> keyToData = dataStore.get(command.keys());
 
     for (String key : command.keys()) {
