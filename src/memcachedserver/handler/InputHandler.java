@@ -1,6 +1,7 @@
 package memcachedserver.handler;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,7 +24,7 @@ import memcachedserver.command.StorageCommand;
 /**
  * For handling input from one client.
  */
-public class InputHandler {
+public class InputHandler implements Closeable {
   @NonNull private final BufferedReader bufferedReader;
 
   public InputHandler(@NonNull final InputStream inputStream) throws IOException {
@@ -117,5 +118,10 @@ public class InputHandler {
     }
 
     return Optional.of(DeleteCommand.of(components[0], components[1]));
+  }
+
+  @Override
+  public void close() throws IOException {
+    bufferedReader.close();
   }
 }
