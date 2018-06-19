@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +16,7 @@ import com.google.common.collect.ImmutableMap;
 
 import memcachedserver.command.DeleteCommand;
 import memcachedserver.command.RetrievalCommand;
+import memcachedserver.command.StorageCommand;
 import memcachedserver.store.Data;
 import memcachedserver.store.DataStore;
 
@@ -37,6 +39,36 @@ public class ClientHandlerTest {
   public void setUp() throws IOException {
     when(dataStore.get(ImmutableList.of(KEY_1, KEY_2, KEY_3))).thenReturn(
         ImmutableMap.of(KEY_1, DATA_1, KEY_3, DATA_3));
+
+    when(dataStore.add(KEY_1, DATA_1)).thenReturn(true);
+
+    when(inputHandler.readData(0)).thenReturn(Optional.of(new Byte[] {}));
+  }
+
+  @Test
+  public void testHandleStorageCommand() throws IOException {
+    StorageCommand command = StorageCommand.of("add", KEY_1, 1, 1, 0);
+
+    clientHandler.handleStorageCommand(command);
+    verify(outputHandler).writeLine("STORED");
+  }
+
+  @Test
+  public void testHandleStorageCommandNotStored() throws IOException {
+    StorageCommand command = StorageCommand.of("add", KEY_1, 1, 1, 0);
+
+    when(dataStore.add(KEY_1, DATA_1)).thenReturn(false);
+    clientHandler.handleStorageCommand(command);
+    verify(outputHandler).writeLine("NOT_STORED");
+  }
+
+  @Test
+  public void testHandleStorageCommandBadData() throws IOException {
+    StorageCommand command = StorageCommand.of("add", KEY_1, 1, 1, 0);
+
+    when(inputHandler.readData(0)).thenReturn(Optional.empty());
+    clientHandler.handleStorageCommand(command);
+    verify(outputHandler).writeLine("CLIENT_ERROR bad data chunk");
   }
 
   @Test
