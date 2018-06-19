@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +60,18 @@ public class ClientHandlerTest {
   @Test
   public void testHandleStorageCommandKeyTooLong() throws IOException {
     String key = StringUtils.repeat('a', 251);
+    StorageCommand command = StorageCommand.of("add", key, 1, 1, 0);
+
+    clientHandler.handleStorageCommand(command);
+    verifyZeroInteractions(dataStore);
+    verifyZeroInteractions(inputHandler);
+
+    verify(outputHandler).writeLine("CLIENT_ERROR bad command line format");
+  }
+
+  @Test
+  public void testHandleStorageCommandKeyHasControlChars() throws IOException {
+    String key = new String(new byte[] {'h', 0x07, 'i'}, StandardCharsets.UTF_8);
     StorageCommand command = StorageCommand.of("add", key, 1, 1, 0);
 
     clientHandler.handleStorageCommand(command);

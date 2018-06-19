@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -23,6 +24,8 @@ import memcachedserver.store.DataStore;
 @RequiredArgsConstructor
 public class ClientHandler implements Runnable {
   private static final int MAX_KEY_LENGTH = 250;
+
+  private static final Pattern CNTRL_CHAR_PATTERN = Pattern.compile("\\p{Cntrl}");
 
   @NonNull private final Socket socket;
   @NonNull private final DataStore dataStore;
@@ -72,6 +75,11 @@ public class ClientHandler implements Runnable {
   @VisibleForTesting
   void handleStorageCommand(final StorageCommand command) throws IOException {
     if (command.key().length() > MAX_KEY_LENGTH) {
+      outputHandler.writeLine("CLIENT_ERROR bad command line format");
+      return;
+    }
+
+    if (CNTRL_CHAR_PATTERN.matcher(command.key()).find()) {
       outputHandler.writeLine("CLIENT_ERROR bad command line format");
       return;
     }
