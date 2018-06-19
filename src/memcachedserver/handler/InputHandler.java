@@ -39,8 +39,12 @@ public class InputHandler implements Closeable {
    * @throws IOException if an I/O error occurs
    */
   public Optional<Command> readCommand() throws IOException {
-    String line = bufferedReader.readLine().trim();
-    String[] components = line.split("\\s+");
+    String line = bufferedReader.readLine();
+    if (line == null) {
+      throw new IOException("end of stream is reached");
+    }
+
+    String[] components = line.trim().split("\\s+");
     return toCommand(components);
   }
 

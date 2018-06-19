@@ -51,6 +51,7 @@ public class ClientHandler implements Runnable {
     } catch (IOException e) {
       // ignore IOException, client closed its connection, so we just need to
       // release our resources and exit this thread
+      System.out.println("Connection closed by client");
     } finally {
       releaseResources();
     }
@@ -66,7 +67,8 @@ public class ClientHandler implements Runnable {
     }
   }
 
-  private void handleStorageCommand(final StorageCommand command) throws IOException {
+  @VisibleForTesting
+  void handleStorageCommand(final StorageCommand command) throws IOException {
     Optional<Byte[]> data = inputHandler.readData(command.numBytes());
     if (!data.isPresent()) {
       outputHandler.writeLine("CLIENT_ERROR bad data chunk");
