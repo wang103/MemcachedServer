@@ -1,12 +1,14 @@
 package memcachedserver.command;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 /**
  * This class represents any storage command, such as "set", "add", "replace".
  */
+@Getter
 @Accessors(fluent = true)
 @EqualsAndHashCode(callSuper = true)
 public class StorageCommand extends Command {

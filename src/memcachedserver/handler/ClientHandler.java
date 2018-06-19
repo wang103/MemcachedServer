@@ -2,10 +2,15 @@ package memcachedserver.handler;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Map;
 import java.util.Optional;
 
 import lombok.NonNull;
 import memcachedserver.command.Command;
+import memcachedserver.command.DeleteCommand;
+import memcachedserver.command.RetrievalCommand;
+import memcachedserver.command.StorageCommand;
+import memcachedserver.store.Data;
 import memcachedserver.store.DataStore;
 
 /**
@@ -46,8 +51,57 @@ public class ClientHandler implements Runnable {
     }
   }
 
-  private void handleCommand(final Command command) {
+  private void handleCommand(final Command command) throws IOException {
+    if (command instanceof StorageCommand) {
+      handleStorageCommand((StorageCommand) command);
+    } else if (command instanceof RetrievalCommand) {
+      handleRetrievalCommand((RetrievalCommand) command);
+    } else {
+      handleDeleteCommand((DeleteCommand) command);
+    }
+  }
 
+  private void handleStorageCommand(final StorageCommand command) throws IOException {
+    Optional<Byte[]> data = inputHandler.readData(command.numBytes());
+    if (!data.isPresent()) {
+      outputHandler.writeLine("CLIENT_ERROR bad data chunk");
+      return;
+    }
+
+    if (command.name().equals("set")) {
+      dataStore.set(command.key(), Data.of(command.flags(), command.expireTime(), data.get()));
+      outputHandler.writeLine("STORED");
+    } else if (command.name().equals("add")) {
+
+    } else if (command.name().equals("replace")) {
+
+    } else if (command.name().equals("append")) {
+
+    } else if (command.name().equals("prepend")) {
+
+    }
+  }
+
+  private void handleRetrievalCommand(final RetrievalCommand command) throws IOException {
+    Map<String, Data> keyToData = dataStore.get(command.keys());
+
+    for (String key : command.keys()) {
+      Data data = keyToData.get(key);
+
+      if (data != null) {
+        outputHandler.writeData(key, data);
+      }
+    }
+
+    outputHandler.writeLine("END");
+  }
+
+  private void handleDeleteCommand(final DeleteCommand command) throws IOException {
+    if (dataStore.delete(command.key())) {
+      outputHandler.writeLine("DELETED");
+    } else {
+      outputHandler.writeLine("NOT_FOUND");
+    }
   }
 
   private void releaseResources() {

@@ -1,5 +1,6 @@
 package memcachedserver.store;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +129,7 @@ public class InMemoryLRUDataStore implements DataStore {
     try {
       ImmutableMap.Builder<String, Data> builder = new ImmutableMap.Builder<>();
 
-      for (String key : keys) {
+      for (String key : new HashSet<>(keys)) {
         Data data = keyToData.get(key);
         if (data != null) {
           builder.put(key, data);

@@ -1,12 +1,14 @@
 package memcachedserver.command;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 /**
  * This class represents a delete command.
  */
+@Getter
 @Accessors(fluent = true)
 @EqualsAndHashCode(callSuper = true)
 public class DeleteCommand extends Command {
