@@ -30,6 +30,13 @@ public class ClientHandler implements Runnable {
     try {
       while (true) {
         Optional<Command> command = inputHandler.readCommand();
+
+        if (!command.isPresent()) {
+          outputHandler.writeLine("ERROR");
+          continue;
+        }
+
+        handleCommand(command.get());
       }
     } catch (IOException e) {
       // ignore IOException, client closed its connection, so we just need to
@@ -37,6 +44,10 @@ public class ClientHandler implements Runnable {
     } finally {
       releaseResources();
     }
+  }
+
+  private void handleCommand(final Command command) {
+
   }
 
   private void releaseResources() {
