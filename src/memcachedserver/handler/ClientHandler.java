@@ -5,7 +5,10 @@ import java.net.Socket;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import memcachedserver.command.Command;
 import memcachedserver.command.DeleteCommand;
 import memcachedserver.command.RetrievalCommand;
@@ -17,17 +20,19 @@ import memcachedserver.store.DataStore;
  * For handling communication with one client via {@link Socket}.
  * This class is responsible for closing the socket when it's no longer needed.
  */
+@RequiredArgsConstructor
 public class ClientHandler implements Runnable {
   @NonNull private final Socket socket;
   @NonNull private final DataStore dataStore;
   @NonNull private final InputHandler inputHandler;
   @NonNull private final OutputHandler outputHandler;
 
-  public ClientHandler(@NonNull final Socket socket, @NonNull final DataStore dataStore) throws IOException {
-    this.socket = socket;
-    this.dataStore = dataStore;
-    this.inputHandler = new InputHandler(socket.getInputStream());
-    this.outputHandler = new OutputHandler(socket.getOutputStream());
+  public ClientHandler(final Socket socket, final DataStore dataStore) throws IOException {
+    this(
+        socket,
+        dataStore,
+        new InputHandler(socket.getInputStream()),
+        new OutputHandler(socket.getOutputStream()));
   }
 
   @Override
@@ -112,7 +117,8 @@ public class ClientHandler implements Runnable {
     outputHandler.writeLine("END");
   }
 
-  private void handleDeleteCommand(final DeleteCommand command) throws IOException {
+  @VisibleForTesting
+  void handleDeleteCommand(final DeleteCommand command) throws IOException {
     if (dataStore.delete(command.key())) {
       outputHandler.writeLine("DELETED");
     } else {
