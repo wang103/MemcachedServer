@@ -6,4 +6,22 @@ The server runs on a single machine, and provides high-performant and high-concu
 
 ## Build
 
+Download the source code:
+    $ git clone https://github.com/wang103/MemcachedServer.git
+    $ cd MemcachedServer
+    
+Install [Apache Ant](https://ant.apache.org/) for building the source code.
+
+Build the source code:
+    $ ant
+
+Start the server:
+    $ ant MemcachedServerApp
+
+Run all test cases:
+    $ ant test
+
+Clean the build:
+    $ ant clean
+
 ## Future Works
