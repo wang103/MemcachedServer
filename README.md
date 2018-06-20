@@ -28,9 +28,9 @@ Start the server:
 
 The server accepts the following arguments:
 
-    * -p <port>       TCP port the server listens on. Default is 11211.
-    * -b <buckets>    The number of buckets in the backend data storage. More buckets, less lock contention. Default is 1000.
-    * -c <capacity>   The capacity for each bucket in the backend data storage. More capacity, less eviction. Default is 10000.
+    -p <port>       TCP port the server listens on. Default is 11211.
+    -b <buckets>    The number of buckets in the backend data storage. More buckets, less lock contention. Default is 1000.
+    -c <capacity>   The capacity for each bucket in the backend data storage. More capacity, less eviction. Default is 10000.
 
 Run all test cases:
 
