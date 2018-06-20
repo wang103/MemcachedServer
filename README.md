@@ -67,5 +67,6 @@ Other Commands
 ## Future Works
 
     1. Fully support all memcached functionalities
-    2. Make it support distributed setup
+    2. Support distributed setup
     3. Benchmark its performance (latency & bandwidth)
+    4. Periodically flush in-memory cache to disk for recovery after potential crash

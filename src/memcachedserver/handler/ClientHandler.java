@@ -99,9 +99,9 @@ public class ClientHandler implements Runnable {
     } else if (command.name().equals("replace")) {
       success = dataStore.replace(command.key(), Data.of(command.flags(), command.expireTime(), data.get()));
     } else if (command.name().equals("append")) {
-      success = dataStore.append(command.name(), data.get());
+      success = dataStore.append(command.key(), data.get());
     } else if (command.name().equals("prepend")) {
-      success = dataStore.prepend(command.name(), data.get());
+      success = dataStore.prepend(command.key(), data.get());
     }
 
     if (success) {
