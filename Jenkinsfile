@@ -1,5 +1,5 @@
 pipeline {
-    agent { docker { image 'hammady/centos-jdk8-ant' } }
+    agent any
     stages {
         stage('build') {
             steps {
