@@ -1,5 +1,5 @@
 pipeline {
-    agent { docker { image 'frekele/ant' } }
+    agent { docker { image 'webratio/ant' } }
     stages {
         stage('build') {
             steps {
